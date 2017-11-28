@@ -35,6 +35,7 @@ import sys
 import time
 import urllib
 import uuid
+import subprocess
 
 
 
@@ -116,7 +117,7 @@ class upnp_device(object):
         if not upnp_device.this_host_ip:
             temp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             try:
-                temp_socket.connect(('8.8.8.8', 53))
+                temp_socket.connect(('192.168.1.1', 53))
                 upnp_device.this_host_ip = temp_socket.getsockname()[0]
             except:
                 upnp_device.this_host_ip = '127.0.0.1'
@@ -373,6 +374,25 @@ class rest_api_handler(object):
         return r.status_code == 200
 
 
+class cmd_handler(object):
+    def __init__(self, on_cmd, off_cmd):
+        self.on_cmd = on_cmd
+        self.off_cmd = off_cmd
+
+    def on(self):
+        _run(self.on_cmd)
+
+    def off(self):
+        _run(self.off_cmd)
+
+    def _run(self, cmd):
+        try:
+            subprocess.check_call(cmd, shell=True)
+        except Exception, e:
+            return False
+        return r.status_code == 200
+
+
 # Each entry is a list with the following elements:
 #
 # name of the virtual switch
@@ -384,8 +404,11 @@ class rest_api_handler(object):
 # list will be used.
 
 FAUXMOS = [
-    ['office lights', rest_api_handler('http://192.168.5.4/ha-api?cmd=on&a=office', 'http://192.168.5.4/ha-api?cmd=off&a=office')],
-    ['kitchen lights', rest_api_handler('http://192.168.5.4/ha-api?cmd=on&a=kitchen', 'http://192.168.5.4/ha-api?cmd=off&a=kitchen')],
+    #['office lights', rest_api_handler('http://192.168.5.4/ha-api?cmd=on&a=office', 'http://192.168.5.4/ha-api?cmd=off&a=office')],
+    #['kitchen lights', rest_api_handler('http://192.168.5.4/ha-api?cmd=on&a=kitchen', 'http://192.168.5.4/ha-api?cmd=off&a=kitchen')],
+    ['pillar light', rest_api_handler('http://192.168.1.126:49153/ha-api?cmd=on&a=Pillar', 'http://192.168.1.126:49153/ha-api?cmd=off&a=Pillar')],
+    ['corner light', rest_api_handler('http://192.168.1.126:49153/ha-api?cmd=on&a=Corner', 'http://192.168.1.126:49153/ha-api?cmd=off&a=Corner')],
+    ['gaming', cmd_handler('/home/osmc/RetroPie/scripts/retropie.sh', '')],
 ]
 
 
