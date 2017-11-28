@@ -302,17 +302,17 @@ class upnp_broadcast_responder(object):
             try:
                 self.ssock.bind(('',self.port))
             except Exception as e:
-                dbg("WARNING: Failed to bind %s:%d: %s" , (self.ip,self.port,e))
+                dbg("WARNING: Failed to bind %s:%d: %s" % (self.ip,self.port,e))
                 ok = False
 
             try:
                 self.ssock.setsockopt(socket.IPPROTO_IP,socket.IP_ADD_MEMBERSHIP,self.mreq)
             except Exception as e:
-                dbg('WARNING: Failed to join multicast group:',e)
+                dbg('WARNING: Failed to join multicast group: %s' % e)
                 ok = False
 
         except Exception as e:
-            dbg("Failed to initialize UPnP sockets:",e)
+            dbg("Failed to initialize UPnP sockets: %s" % e)
             return False
         if ok:
             dbg("Listening for UPnP broadcasts")
@@ -323,7 +323,7 @@ class upnp_broadcast_responder(object):
     def do_read(self, fileno):
         data, sender = self.recvfrom(1024)
         if data:
-            if data.find('M-SEARCH') == 0 and data.find('urn:Belkin:device:**') != -1:
+            if str(data).find('M-SEARCH') == 0 and str(data).find('urn:Belkin:device:**') != -1:
                 for device in self.devices:
                     time.sleep(0.1)
                     device.respond_to_search(sender, 'urn:Belkin:device:**')
@@ -385,9 +385,11 @@ class cmd_handler(object):
     def off(self):
         self._run(self.off_cmd)
 
-    def _run(self, cmd):
+    @staticmethod
+    def _run(cmd):
         try:
             subprocess.check_call(cmd, shell=True)
+            return True
         except Exception as e:
             return False
 
@@ -435,11 +437,7 @@ for one_faux in FAUXMOS:
 dbg("Entering main loop\n")
 
 while True:
-    try:
-        # Allow time for a ctrl-c to stop the process
-        p.poll(100)
-        time.sleep(0.1)
-    except Exception as e:
-        dbg(e)
-        break
+    # Allow time for a ctrl-c to stop the process
+    p.poll(1)
+    time.sleep(0.1)
 
