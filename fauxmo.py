@@ -409,7 +409,8 @@ FAUXMOS = [
     #['kitchen lights', rest_api_handler('http://192.168.5.4/ha-api?cmd=on&a=kitchen', 'http://192.168.5.4/ha-api?cmd=off&a=kitchen')],
     ['pillar light', rest_api_handler('http://192.168.1.126:49153/ha-api?cmd=on&a=Pillar', 'http://192.168.1.126:49153/ha-api?cmd=off&a=Pillar')],
     ['corner light', rest_api_handler('http://192.168.1.126:49153/ha-api?cmd=on&a=Corner', 'http://192.168.1.126:49153/ha-api?cmd=off&a=Corner')],
-    ['gaming', cmd_handler('/home/osmc/RetroPie/scripts/retropie.sh', '')],
+    ['gaming', cmd_handler('/home/osmc/RetroPie/scripts/retropie.sh', 'pkill -e -SIGTERM emulatio')],
+    ['tv', cmd_handler('echo "on 0" | cec-client -s', 'echo "standby 0" | cec-client -s')],
 ]
 
 
